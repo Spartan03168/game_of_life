@@ -57,17 +57,17 @@ class Board(AbstractLifeGameBoard):
                     result += "0"
                 else:
                     result += "."
+            result += "\n"
         return result
     def is_alive(self, row: int, col: int):
         try:
-            if row<0 or row>self.height:
+            if row<0 or row>=self.height:
                 raise IndexError
-            if col<0 or col>self.height:
+            if col<0 or col>=self.width:
                 raise IndexError
-            result = self.board
         except IndexError:
             result = False
-        return result
+            return result
 
         return self.board[col][row]
 
@@ -82,10 +82,8 @@ class Board(AbstractLifeGameBoard):
             for j in range(-1,2):
                 if i==0 and j==0:
                     continue
-                row += 1
-                col += 1
-                self.is_alive(row+i, col+j)
-                neibours += 1
+                neibours += self.is_alive(row+i, col+j)
+        return neibours
     def next(self) -> None:
         new_board = []
         for i in range(self.height):
@@ -94,10 +92,18 @@ class Board(AbstractLifeGameBoard):
                 row.append(False)
             new_board.append(row)
 
-        for row_data in range(len(self.board)) :
-            for cell in range(self.width):
-                new_board = self.liveness_tester(row_data,cell)
-            return new_board
+        for index_X in range(len(self.board)) :
+            for index_Y in range(self.width):
+                state = False
+                neibour_count = self.liveness_tester(index_X, index_Y)
+                if neibour_count == 2 and self.is_alive(index_X,index_Y):
+                    state = True
+                elif neibour_count == 3 and self.is_alive(index_X,index_Y):
+                    state = True
+                elif neibour_count == 3 and not self.is_alive(index_X,index_Y):
+                    state = True
+                new_board[index_Y][index_X] = state
+        self.board = new_board
 
 
 
